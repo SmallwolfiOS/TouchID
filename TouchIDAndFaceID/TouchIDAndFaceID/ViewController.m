@@ -28,9 +28,8 @@
     
     [self intiSubUI];
     [self function];
-    
-    
 }
+
 - (void)intiSubUI{
     self.lblMsg = [[UILabel alloc]initWithFrame:CGRectMake(30, 100, SCREEN_WIDTH - 60, 50)];
     self.lblMsg.textAlignment = NSTextAlignmentCenter;
@@ -42,10 +41,8 @@
     self.btnCheck.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.btnCheck.layer.borderWidth = 0.5f;
     self.btnCheck.layer.borderColor = [UIColor redColor].CGColor;
+    [self.btnCheck addTarget:self action:@selector(didClickBtnCheck:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.btnCheck];
-    
-    
-    
 }
 - (void)function{
     //检测当前设备是否支持TouchID或者FaceID
@@ -91,9 +88,6 @@
             }
         }
     }
-    
-    
-    
 }
 // 判断生物识别类型，更新UI
 - (void)justSupportBiometricsType:(NSInteger)biometryType{
@@ -146,7 +140,20 @@
        
     }
 }
-
+- (void)didClickBtnCheck:(UIButton *)btn{
+    NSString *myLocalizedReasonString = @"验证";
+    [self.LAContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:myLocalizedReasonString reply:^(BOOL success, NSError * _Nullable error) {
+        if (success) {
+            NSLog(@"身份验证成功！");
+            [self showAlertView:@"验证成功"];
+        } else {
+            // 做特定的错误判断处理逻辑。
+            NSLog(@"身份验证失败！ \nerrorCode : %ld, errorMsg : %@",(long)error.code, error.localizedDescription);
+            // error 参考 LAError.h
+            [self showAlertView:[NSString stringWithFormat:@"身份验证失败！\nerrCode : %ld\nerrorMsg : %@",(long)error.code, error.localizedDescription]];
+        }
+    }];
+}
     
     
 @end
